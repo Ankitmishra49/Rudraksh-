@@ -1,0 +1,16 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SMT AI Bot PRO</title><style>
+*{box-sizing:border-box}body{margin:0;background:#070a10;color:#e9eef8;font-family:Inter,system-ui}.wrap{max-width:1150px;margin:auto;padding:24px}
+.top{display:flex;justify-content:space-between;align-items:center}.muted{color:#8d98aa}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}.card{background:#0f151f;border:1px solid #202b3a;border-radius:16px;padding:18px}.big{font-size:28px;font-weight:800;margin-top:7px}.signal{font-size:46px;font-weight:900}.buy{color:#32d583}.sell{color:#ff6475}.wait{color:#ffd166}.row{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #202b3a;text-align:left}button{background:#e9eef8;border:0;border-radius:9px;padding:10px 15px;font-weight:800}@media(max-width:750px){.grid,.row{grid-template-columns:1fr 1fr}.row{display:block}.grid .card{margin-bottom:8px}}
+</style></head><body><div class="wrap"><div class="top"><div><h1>SMT AI Bot PRO</h1><div class="muted">Live market analysis • Paper Trading</div></div><button onclick="load()">Refresh</button></div>
+<div class="grid"><div class="card"><div class="muted">STATUS</div><div id="status" class="big">...</div></div><div class="card"><div class="muted">MODE</div><div id="mode" class="big">...</div></div><div class="card"><div class="muted">PAIR</div><div id="pair" class="big">...</div></div><div class="card"><div class="muted">RISK</div><div id="risk" class="big">...</div></div></div>
+<div class="row"><div class="card"><div class="muted">CURRENT SIGNAL</div><div id="sig" class="signal wait">WAIT</div><p id="reason" class="muted">Loading...</p></div>
+<div class="card"><div class="muted">TRADE PLAN</div><p>Entry: <b id="entry">—</b></p><p>Stop: <b id="stop">—</b></p><p>Target: <b id="target">—</b></p><p>Quantity: <b id="qty">—</b></p></div></div>
+<div class="card" style="margin-top:12px"><h2>Paper Trade Journal</h2><table><thead><tr><th>Time</th><th>Symbol</th><th>Side</th><th>Entry</th><th>Status</th></tr></thead><tbody id="trades"></tbody></table></div></div>
+<script>
+async function load(){try{let [h,c,a,t]=await Promise.all(['/api/health','/api/config','/api/analysis','/api/trades'].map(x=>fetch(x).then(r=>r.json())));
+status.textContent=h.status;mode.textContent=c.mode.toUpperCase();pair.textContent=c.a;risk.textContent=(c.risk*100).toFixed(1)+'%';
+let x=a.analysis;if(x){sig.textContent=x.signal;sig.className='signal '+x.signal.toLowerCase();reason.textContent=x.reason+' • '+x.trend+' • confidence '+Math.round(x.confidence*100)+'%';entry.textContent=x.levels?.entry?.toFixed(2)||x.price?.toFixed(2)||'—';stop.textContent=x.levels?.stop?.toFixed(2)||'—';target.textContent=x.levels?.target?.toFixed(2)||'—';qty.textContent=x.quantity?.toFixed(5)||'—'}
+trades.innerHTML=t.map(x=>`<tr><td>${x.created_at.slice(0,19).replace('T',' ')}</td><td>${x.symbol}</td><td>${x.side}</td><td>${x.entry}</td><td>${x.status}</td></tr>`).join('')}catch(e){status.textContent='ERROR'}}
+load();setInterval(load,10000);
+</script></body></html>
