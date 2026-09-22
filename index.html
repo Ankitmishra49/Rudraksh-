@@ -1,16 +1,626 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SMT AI Bot PRO</title><style>
-*{box-sizing:border-box}body{margin:0;background:#070a10;color:#e9eef8;font-family:Inter,system-ui}.wrap{max-width:1150px;margin:auto;padding:24px}
-.top{display:flex;justify-content:space-between;align-items:center}.muted{color:#8d98aa}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}.card{background:#0f151f;border:1px solid #202b3a;border-radius:16px;padding:18px}.big{font-size:28px;font-weight:800;margin-top:7px}.signal{font-size:46px;font-weight:900}.buy{color:#32d583}.sell{color:#ff6475}.wait{color:#ffd166}.row{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #202b3a;text-align:left}button{background:#e9eef8;border:0;border-radius:9px;padding:10px 15px;font-weight:800}@media(max-width:750px){.grid,.row{grid-template-columns:1fr 1fr}.row{display:block}.grid .card{margin-bottom:8px}}
-</style></head><body><div class="wrap"><div class="top"><div><h1>SMT AI Bot PRO</h1><div class="muted">Live market analysis • Paper Trading</div></div><button onclick="load()">Refresh</button></div>
-<div class="grid"><div class="card"><div class="muted">STATUS</div><div id="status" class="big">...</div></div><div class="card"><div class="muted">MODE</div><div id="mode" class="big">...</div></div><div class="card"><div class="muted">PAIR</div><div id="pair" class="big">...</div></div><div class="card"><div class="muted">RISK</div><div id="risk" class="big">...</div></div></div>
-<div class="row"><div class="card"><div class="muted">CURRENT SIGNAL</div><div id="sig" class="signal wait">WAIT</div><p id="reason" class="muted">Loading...</p></div>
-<div class="card"><div class="muted">TRADE PLAN</div><p>Entry: <b id="entry">—</b></p><p>Stop: <b id="stop">—</b></p><p>Target: <b id="target">—</b></p><p>Quantity: <b id="qty">—</b></p></div></div>
-<div class="card" style="margin-top:12px"><h2>Paper Trade Journal</h2><table><thead><tr><th>Time</th><th>Symbol</th><th>Side</th><th>Entry</th><th>Status</th></tr></thead><tbody id="trades"></tbody></table></div></div>
-<script>
-async function load(){try{let [h,c,a,t]=await Promise.all(['/api/health','/api/config','/api/analysis','/api/trades'].map(x=>fetch(x).then(r=>r.json())));
-status.textContent=h.status;mode.textContent=c.mode.toUpperCase();pair.textContent=c.a;risk.textContent=(c.risk*100).toFixed(1)+'%';
-let x=a.analysis;if(x){sig.textContent=x.signal;sig.className='signal '+x.signal.toLowerCase();reason.textContent=x.reason+' • '+x.trend+' • confidence '+Math.round(x.confidence*100)+'%';entry.textContent=x.levels?.entry?.toFixed(2)||x.price?.toFixed(2)||'—';stop.textContent=x.levels?.stop?.toFixed(2)||'—';target.textContent=x.levels?.target?.toFixed(2)||'—';qty.textContent=x.quantity?.toFixed(5)||'—'}
-trades.innerHTML=t.map(x=>`<tr><td>${x.created_at.slice(0,19).replace('T',' ')}</td><td>${x.symbol}</td><td>${x.side}</td><td>${x.entry}</td><td>${x.status}</td></tr>`).join('')}catch(e){status.textContent='ERROR'}}
-load();setInterval(load,10000);
-</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train GPS Tracker - Real-time Tracking</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-xxxxxxxxxxxxxxxx"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-btn.premium {
+            background: #ffd700;
+            color: #333;
+            border: none;
+        }
+
+        .nav-btn.premium:hover {
+            background: #ffed4e;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .ad-top {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .ad-placeholder {
+            background: #f0f0f0;
+            padding: 2rem;
+            border-radius: 6px;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        .content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 0 1rem 0;
+            color: #333;
+        }
+
+        .premium-badge {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .premium-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .premium-features {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .premium-features li {
+            margin: 6px 0;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #1565c0;
+        }
+
+        .track-view {
+            background: #f5f5f5;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            padding: 2rem 1rem;
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .track-line {
+            position: absolute;
+            width: calc(100% - 100px);
+            height: 6px;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            top: 50%;
+            left: 50px;
+            transform: translateY(-50%);
+            border-radius: 3px;
+        }
+
+        .station-start, .station-end {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .station-start {
+            left: 10px;
+            background: #4caf50;
+            color: white;
+        }
+
+        .station-end {
+            right: 10px;
+            background: #f44336;
+            color: white;
+        }
+
+        .train {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: left 0.3s ease;
+        }
+
+        .train-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .train-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .distance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .distance-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .distance-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 0.5rem 0 0 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 0 1rem 0;
+            color: #333;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stat-label {
+            color: #999;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #333;
+            font-family: monospace;
+        }
+
+        .ad-sidebar {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+            font-size: 12px;
+            margin-top: 2rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-close {
+            float: right;
+            cursor: pointer;
+            font-size: 24px;
+            color: #999;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🚂 Train GPS Tracker</h1>
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="showLogin()">Login</button>
+            <button class="nav-btn premium" onclick="showPremium()">⭐ Premium</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="ad-top">
+            <div class="ad-placeholder">
+                [Google AdSense Banner Ad 728x90]<br>
+                Replace with: &lt;script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"&gt;&lt;/script&gt;
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="content">
+                <div class="info-box">
+                    💡 Real-time GPS tracking of trains. Works offline in flight mode!
+                </div>
+
+                <div class="track-view">
+                    <div class="track-line"></div>
+                    <div class="station-start">A</div>
+                    <div class="station-end">B</div>
+                    <div class="train" id="train-a" style="left: 50px;">
+                        <div class="train-icon">🚂</div>
+                        <div class="train-label">Train A</div>
+                    </div>
+                    <div class="train" id="train-b" style="left: 400px;">
+                        <div class="train-icon">🚆</div>
+                        <div class="train-label">Train B</div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn active" onclick="togglePlay()">▶️ Start</button>
+                    <button class="btn" onclick="togglePause()">⏸️ Pause</button>
+                    <button class="btn" onclick="resetTrains()">🔄 Reset</button>
+                </div>
+
+                <div class="distance-card">
+                    <p class="distance-label">Distance Between Trains</p>
+                    <p class="distance-value" id="distance">0.0 km</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 class="stat-title">🚂 Train A</h3>
+                        <div class="stat-row">
+                            <span class="stat-label">Latitude</span>
+                            <span class="stat-value" id="lat-a">28.7041°</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Longitude</span>
+                            <span class="stat-value" id="lon-a">77.1025°</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Speed</span>
+                            <span class="stat-value" id="speed-a">0 km/h</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3 class="stat-title">🚆 Train B</h3>
+                        <div class="stat-row">
+                            <span class="stat-label">Latitude</span>
+                            <span class="stat-value" id="lat-b">28.7100°</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Longitude</span>
+                            <span class="stat-value" id="lon-b">77.1200°</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Speed</span>
+                            <span class="stat-value" id="speed-b">0 km/h</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-card">
+                    <div class="premium-badge" onclick="showPremium()">
+                        ⭐ Go Premium
+                        <div style="font-size: 12px; margin-top: 0.5rem; font-weight: normal;">
+                            ₹99/month
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">📊 Premium Features</h3>
+                    <ul class="premium-features">
+                        <li>✅ Track 10+ trains</li>
+                        <li>✅ Advanced analytics</li>
+                        <li>✅ Export to CSV/PDF</li>
+                        <li>✅ Real-time alerts</li>
+                        <li>✅ No ads</li>
+                        <li>✅24/7 support</li>
+                    </ul>
+                </div>
+
+                <div class="ad-sidebar">
+                    [Google AdSense<br>Vertical Ad 300x250]
+                </div>
+
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">📱 Stats</h3>
+                    <div style="font-size: 12px; color: #666; line-height: 2;">
+                        <div>👥 5,234 Users</div>
+                        <div>🚂 12,450 Trains</div>
+                        <div>📍 150K+ Journeys</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>Train GPS Tracker</strong> • Premium Train Tracking Solution • Monetized App v1.0<br>
+        Contact: support@traingpstracker.com | Help | Privacy | Terms
+    </div>
+
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Login / Sign Up</h2>
+            <input type="email" placeholder="Email" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px;">
+            <input type="password" placeholder="Password" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px;">
+            <button style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Login</button>
+        </div>
+    </div>
+
+    <div class="modal" id="premiumModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('premiumModal')">&times;</span>
+            <h2>⭐ Premium Plan</h2>
+            <h3 style="color: #667eea;">₹99/month</h3>
+            <ul style="font-size: 14px; line-height: 2; color: #666;">
+                <li>✅ Track unlimited trains</li>
+                <li>✅ Advanced analytics & reports</li>
+                <li>✅ Export to CSV/PDF</li>
+                <li>✅ Real-time push notifications</li>
+                <li>✅ Remove all ads</li>
+                <li>✅ Priority support</li>
+                <li>✅ Custom alerts</li>
+            </ul>
+            <button onclick="proceedPayment()" style="width: 100%; padding: 12px; background: #ffd700; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 1rem;">Get Premium Now</button>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            isRunning: false,
+            time: 0,
+            trackLength: 500,
+            positionA: 50,
+            positionB: 400,
+            speedA: 80,
+            speedB: 95,
+            baseLatA: 28.7041,
+            baseLonA: 77.1025,
+            baseLatB: 28.7100,
+            baseLonB: 77.1200
+        };
+
+        function togglePlay() {
+            state.isRunning = true;
+            animate();
+        }
+
+        function togglePause() {
+            state.isRunning = false;
+        }
+
+        function resetTrains() {
+            state.time = 0;
+            state.positionA = 50;
+            state.positionB = 400;
+            state.isRunning = false;
+            updateUI();
+        }
+
+        function animate() {
+            if (!state.isRunning) return;
+
+            state.time += 0.016;
+            state.positionA += (state.speedA / 3600);
+            state.positionB += (state.speedB / 3600);
+
+            if (state.positionA > state.trackLength + 50) state.positionA = -50;
+            if (state.positionB > state.trackLength + 50) state.positionB = -50;
+
+            state.speedA = 80 + Math.sin(state.time * 0.5) * 20;
+            state.speedB = 95 + Math.cos(state.time * 0.4) * 25;
+
+            updateUI();
+            requestAnimationFrame(animate);
+        }
+
+        function updateUI() {
+            document.getElementById('train-a').style.left = (50 + state.positionA) + 'px';
+            document.getElementById('train-b').style.left = (50 + state.positionB) + 'px';
+
+            const latA = (state.baseLatA + state.positionA * 0.0001).toFixed(4);
+            const lonA = (state.baseLonA + state.positionA * 0.0002).toFixed(4);
+            const latB = (state.baseLatB + state.positionB * 0.0001).toFixed(4);
+            const lonB = (state.baseLonB + state.positionB * 0.0002).toFixed(4);
+
+            document.getElementById('lat-a').textContent = latA + '°';
+            document.getElementById('lon-a').textContent = lonA + '°';
+            document.getElementById('lat-b').textContent = latB + '°';
+            document.getElementById('lon-b').textContent = lonB + '°';
+
+            document.getElementById('speed-a').textContent = Math.max(0, Math.round(state.speedA)) + ' km/h';
+            document.getElementById('speed-b').textContent = Math.max(0, Math.round(state.speedB)) + ' km/h';
+
+            const distance = Math.abs(state.positionB - state.positionA) * 0.1;
+            document.getElementById('distance').textContent = distance.toFixed(1) + ' km';
+        }
+
+        function showLogin() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function showPremium() {
+            document.getElementById('premiumModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function proceedPayment() {
+            alert('Payment Gateway Integration (Razorpay/Stripe)\nRedirect to payment page...');
+            closeModal('premiumModal');
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train GPS Tracker - Offline</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .header-subtitle {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .badge-offline {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #1565c0;
+            line-height: 1.6;
+        }
+
+        .track-view {
+            background: #f5f5f5;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            padding: 2rem 1rem;
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .track-line {
+            position: absolute;
+            width: calc(100% - 100px);
+            height: 6px;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            top: 50%;
+            left: 50px;
+            transform: translateY(-50%);
+            border-radius: 3px;
+        }
+
+        .station-start,
+        .station-end {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .station-start {
+            left: 10px;
+            background: #4caf50;
+            color: white;
+        }
+
+        .station-end {
+            right: 10px;
+            background: #f44336;
+            color: white;
+        }
+
+        .train {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: left 0.3s ease;
+            cursor: pointer;
+        }
+
+        .train-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .train-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .distance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .distance-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .distance-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 0.5rem 0 0 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.1);
+        }
+
+        .stat-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .train-indicator {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .train-a-indicator {
+            background: #667eea;
+        }
+
+        .train-b-indicator {
+            background: #ff9800;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #999;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #333;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .speed-bar {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f5f5f5;
+        }
+
+        .speed-label {
+            font-size: 11px;
+            color: #999;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .speed-track {
+            width: 100%;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .speed-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .train-a .speed-fill {
+            background: #667eea;
+        }
+
+        .train-b .speed-fill {
+            background: #ff9800;
+        }
+
+        .footer {
+            background: #f9f9f9;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #eee;
+        }
+
+        .icon {
+            font-size: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .content {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 1.5rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .track-view {
+                height: 180px;
+                padding: 1.5rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🚂 Train GPS Tracker</h1>
+            <p class="header-subtitle">Real-time offline GPS tracking</p>
+            <div class="badge-offline">
+                <span class="icon">✈️</span> Works in Flight Mode - No Internet Required
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="info-box">
+                <strong>💡 How it works:</strong> This app simulates real-time GPS data from two trains. No internet connection needed - fully offline functionality. Enable airplane mode and it still works!
+            </div>
+
+            <div class="track-view">
+                <div class="track-line"></div>
+                <div class="station-start">A</div>
+                <div class="station-end">B</div>
+                <div class="train" id="train-a" style="left: 50px;">
+                    <div class="train-icon">🚂</div>
+                    <div class="train-label">Train A</div>
+                </div>
+                <div class="train" id="train-b" style="left: 400px;">
+                    <div class="train-icon">🚆</div>
+                    <div class="train-label">Train B</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn active" id="play-btn" onclick="togglePlay()">
+                    <span class="icon">▶️</span> Start
+                </button>
+                <button class="btn" id="pause-btn" onclick="togglePause()">
+                    <span class="icon">⏸️</span> Pause
+                </button>
+                <button class="btn" onclick="resetTrains()">
+                    <span class="icon">🔄</span> Reset
+                </button>
+                <button class="btn" onclick="toggleSpeed()">
+                    <span class="icon">⚡</span> <span id="speed-mode">Normal Speed</span>
+                </button>
+            </div>
+
+            <div class="distance-card">
+                <p class="distance-label">Distance Between Trains</p>
+                <p class="distance-value" id="distance">0.0 km</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card train-a">
+                    <h3 class="stat-title">
+                        <span class="train-indicator train-a-indicator"></span>
+                        Train A (Express)
+                    </h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Latitude</span>
+                        <span class="stat-value" id="lat-a">28.7041°</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Longitude</span>
+                        <span class="stat-value" id="lon-a">77.1025°</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Altitude</span>
+                        <span class="stat-value" id="alt-a">215 m</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Speed</span>
+                        <span class="stat-value" id="speed-a">0 km/h</span>
+                    </div>
+                    <div class="speed-bar">
+                        <div class="speed-label">Current speed indicator</div>
+                        <div class="speed-track">
+                            <div class="speed-fill" id="speed-bar-a" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card train-b">
+                    <h3 class="stat-title">
+                        <span class="train-indicator train-b-indicator"></span>
+                        Train B (Rapid)
+                    </h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Latitude</span>
+                        <span class="stat-value" id="lat-b">28.7100°</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Longitude</span>
+                        <span class="stat-value" id="lon-b">77.1200°</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Altitude</span>
+                        <span class="stat-value" id="alt-b">220 m</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Speed</span>
+                        <span class="stat-value" id="speed-b">0 km/h</span>
+                    </div>
+                    <div class="speed-bar">
+                        <div class="speed-label">Current speed indicator</div>
+                        <div class="speed-track">
+                            <div class="speed-fill" id="speed-bar-b" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <strong>Train GPS Tracker v1.0</strong> • Fully Offline • No Internet Required • Works on Mobile & Desktop
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            isRunning: false,
+            speedMultiplier: 1,
+            time: 0,
+            trackLength: 500,
+            positionA: 50,
+            positionB: 400,
+            speedA: 80,
+            speedB: 95,
+            baseLatA: 28.7041,
+            baseLonA: 77.1025,
+            baseLatB: 28.7100,
+            baseLonB: 77.1200,
+            altA: 215,
+            altB: 220
+        };
+
+        function togglePlay() {
+            state.isRunning = true;
+            document.getElementById('play-btn').classList.add('active');
+            document.getElementById('pause-btn').classList.remove('active');
+            animate();
+        }
+
+        function togglePause() {
+            state.isRunning = false;
+            document.getElementById('play-btn').classList.remove('active');
+            document.getElementById('pause-btn').classList.add('active');
+        }
+
+        function toggleSpeed() {
+            state.speedMultiplier = state.speedMultiplier === 1 ? 2 : 1;
+            document.getElementById('speed-mode').textContent = state.speedMultiplier === 1 ? 'Normal Speed' : 'Fast Speed (2x)';
+        }
+
+        function resetTrains() {
+            state.time = 0;
+            state.positionA = 50;
+            state.positionB = 400;
+            state.isRunning = false;
+            updateUI();
+            document.getElementById('play-btn').classList.remove('active');
+            document.getElementById('pause-btn').classList.remove('active');
+        }
+
+        function animate() {
+            if (!state.isRunning) return;
+
+            state.time += 0.016 * state.speedMultiplier;
+
+            state.positionA += (state.speedA / 3600) * state.speedMultiplier;
+            state.positionB += (state.speedB / 3600) * state.speedMultiplier;
+
+            if (state.positionA > state.trackLength + 50) state.positionA = -50;
+            if (state.positionB > state.trackLength + 50) state.positionB = -50;
+
+            state.speedA = 80 + Math.sin(state.time * 0.5) * 20;
+            state.speedB = 95 + Math.cos(state.time * 0.4) * 25;
+
+            state.altA = 215 + Math.sin(state.time * 0.3) * 5;
+            state.altB = 220 + Math.cos(state.time * 0.25) * 5;
+
+            updateUI();
+            requestAnimationFrame(animate);
+        }
+
+        function updateUI() {
+            document.getElementById('train-a').style.left = (50 + state.positionA) + 'px';
+            document.getElementById('train-b').style.left = (50 + state.positionB) + 'px';
+
+            const latA = (state.baseLatA + state.positionA * 0.0001).toFixed(4);
+            const lonA = (state.baseLonA + state.positionA * 0.0002).toFixed(4);
+            const latB = (state.baseLatB + state.positionB * 0.0001).toFixed(4);
+            const lonB = (state.baseLonB + state.positionB * 0.0002).toFixed(4);
+
+            document.getElementById('lat-a').textContent = latA + '°';
+            document.getElementById('lon-a').textContent = lonA + '°';
+            document.getElementById('lat-b').textContent = latB + '°';
+            document.getElementById('lon-b').textContent = lonB + '°';
+
+            const speedAInt = Math.max(0, Math.round(state.speedA));
+            const speedBInt = Math.max(0, Math.round(state.speedB));
+
+            document.getElementById('speed-a').textContent = speedAInt + ' km/h';
+            document.getElementById('speed-b').textContent = speedBInt + ' km/h';
+
+            document.getElementById('speed-bar-a').style.width = (speedAInt / 120 * 100) + '%';
+            document.getElementById('speed-bar-b').style.width = (speedBInt / 120 * 100) + '%';
+
+            document.getElementById('alt-a').textContent = Math.round(state.altA) + ' m';
+            document.getElementById('alt-b').textContent = Math.round(state.altB) + ' m';
+
+            const distance = Math.abs(state.positionB - state.positionA) * 0.1;
+            document.getElementById('distance').textContent = distance.toFixed(1) + ' km';
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>

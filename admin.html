@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Train GPS Tracker</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            color: #999;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin: 0 0 1rem 0;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: #999;
+            margin-top: 0.5rem;
+        }
+
+        .table-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: #f5f5f5;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #eee;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            color: #666;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .chart {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        🎛️ Admin Dashboard
+    </div>
+
+    <div class="container">
+        <h2>Revenue & Analytics</h2>
+
+        <div class="grid">
+            <div class="card">
+                <p class="card-title">Total Revenue</p>
+                <p class="card-value">₹12,450</p>
+                <p class="card-subtitle">This month (+15% vs last month)</p>
+            </div>
+
+            <div class="card">
+                <p class="card-title">Active Users</p>
+                <p class="card-value">5,234</p>
+                <p class="card-subtitle">Premium: 234 | Free: 5,000</p>
+            </div>
+
+            <div class="card">
+                <p class="card-title">Ad Revenue</p>
+                <p class="card-value">₹8,450</p>
+                <p class="card-subtitle">Google AdSense earnings</p>
+            </div>
+
+            <div class="card">
+                <p class="card-title">Premium Revenue</p>
+                <p class="card-value">₹4,000</p>
+                <p class="card-subtitle">234 subscribers × ₹99</p>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <p class="card-title">Total Pageviews</p>
+                <p class="card-value">45,678</p>
+                <p class="card-subtitle">All-time: 234,567</p>
+            </div>
+
+            <div class="card">
+                <p class="card-title">Conversion Rate</p>
+                <p class="card-value">4.5%</p>
+                <p class="card-subtitle">Free to Premium</p>
+            </div>
+
+            <div class="card">
+                <p class="card-title">Bounce Rate</p>
+                <p class="card-value">22%</p>
+                <p class="card-subtitle">Good engagement</p>
+            </div>
+
+            <div class="card">
+                <p class="card-title">Avg Session</p>
+                <p class="card-value">4m 35s</p>
+                <p class="card-subtitle">Per user</p>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <h3>Recent Premium Subscriptions</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Plan</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Raj Kumar</td>
+                        <td>raj@example.com</td>
+                        <td>Premium Monthly</td>
+                        <td>₹99</td>
+                        <td>2024-09-22</td>
+                        <td><span class="badge badge-success">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>Priya Singh</td>
+                        <td>priya@example.com</td>
+                        <td>Premium Yearly</td>
+                        <td>₹999</td>
+                        <td>2024-09-21</td>
+                        <td><span class="badge badge-success">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>Amit Patel</td>
+                        <td>amit@example.com</td>
+                        <td>Premium Monthly</td>
+                        <td>₹99</td>
+                        <td>2024-09-20</td>
+                        <td><span class="badge badge-warning">Trial</span></td>
+                    </tr>
+                    <tr>
+                        <td>Neha Sharma</td>
+                        <td>neha@example.com</td>
+                        <td>Premium Monthly</td>
+                        <td>₹99</td>
+                        <td>2024-09-19</td>
+                        <td><span class="badge badge-danger">Cancelled</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-card">
+            <h3>Top Monetization Sources</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Revenue</th>
+                        <th>Percentage</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Google AdSense</td>
+                        <td>₹8,450</td>
+                        <td>67.8%</td>
+                        <td><span class="badge badge-success">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>Premium Subscriptions</td>
+                        <td>₹4,000</td>
+                        <td>32.2%</td>
+                        <td><span class="badge badge-success">Active</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-card">
+            <h3>Payment Gateway Integration</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gateway</th>
+                        <th>Setup Status</th>
+                        <th>Commission</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Razorpay</td>
+                        <td><span class="badge badge-success">Connected</span></td>
+                        <td>2.36%</td>
+                        <td><button class="btn" style="padding: 5px 10px; font-size: 12px;">Configure</button></td>
+                    </tr>
+                    <tr>
+                        <td>Stripe</td>
+                        <td><span class="badge badge-warning">Pending</span></td>
+                        <td>2.9%</td>
+                        <td><button class="btn" style="padding: 5px 10px; font-size: 12px;">Setup</button></td>
+                    </tr>
+                    <tr>
+                        <td>Google AdSense</td>
+                        <td><span class="badge badge-success">Connected</span></td>
+                        <td>32%</td>
+                        <td><button class="btn" style="padding: 5px 10px; font-size: 12px;">View Report</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <strong>Train GPS Tracker Admin</strong> • Monetized App Dashboard<br>
+            Last updated: Today at 2:30 PM
+        </div>
+    </div>
+</body>
+</html>
