@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dolli Candy Match</title>
+<style>
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; padding: 18px 10px 30px;
+  font-family: system-ui, Arial, sans-serif; text-align: center; color: #fff;
+  background: linear-gradient(140deg, #401078, #d52e83);
+}
+h1 { margin: 8px 0; font-size: clamp(25px, 6vw, 36px); }
+p { margin: 8px 0 14px; }
+.stats { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; }
+.badge { background:#ffffff22; border:1px solid #ffffff66; border-radius:12px; padding:9px 14px; font-weight:700; }
+#board {
+  width:min(94vw, 440px); margin:18px auto; padding:6px; display:grid;
+  grid-template-columns:repeat(8,minmax(0,1fr)); gap:4px;
+  background:#30064f; border:2px solid #ffffff55; border-radius:14px;
+  touch-action: manipulation;
+}
+.tile {
+  min-width:0; aspect-ratio:1; padding:0; border:0; border-radius:9px;
+  background:#ffffff20; display:grid; place-items:center;
+  font-size:clamp(18px, 5.8vw, 32px); cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.tile:focus-visible { outline:3px solid #fff; outline-offset:1px; }
+.tile.selected { outline:3px solid #ffe66d; background:#ffffff50; }
+.tile:disabled { cursor:default; }
+button.action {
+  border:0; border-radius:24px; padding:11px 20px; margin:5px;
+  background:#ffe66d; color:#45105f; font-weight:800; font-size:16px;
+}
+#message { min-height: 26px; font-weight:700; }
+footer { font-size:12px; opacity:.8; margin-top:12px; }
+</style>
+</head>
+<body>
+<h1>🍭 Dolli Candy Match 🍬</h1>
+<p>पास-पास की कैंडी बदलें और 3 या अधिक मिलाएँ!</p>
+<div class="stats" aria-live="polite">
+  <div class="badge">⭐ स्कोर: <span id="score">0</span></div>
+  <div class="badge">🎯 लक्ष्य: <span id="target">500</span></div>
+  <div class="badge">🔁 चालें: <span id="moves">30</span></div>
+</div>
+<div id="board" role="group" aria-label="Candy game board"></div>
+<div id="message" role="status">गेम शुरू है — कैंडी चुनें।</div>
+<button class="action" id="restart" type="button">🔄 नया गेम</button>
+<footer>एक स्वतंत्र Match-3 डेमो; Candy Crush का आधिकारिक गेम नहीं।</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  const SIZE = 8;
+  const TARGET = 500;
+  const START_MOVES = 30;
+  const CANDIES = ["🍬", "🍭", "🍒", "🍋", "🍇", "🍊"];
+
+  const boardEl = document.getElementById("board");
+  const scoreEl = document.getElementById("score");
+  const movesEl = document.getElementById("moves");
+  const targetEl = document.getElementById("target");
+  const messageEl = document.getElementById("message");
+  const restartEl = document.getElementById("restart");
+
+  let board = [];
+  let score = 0;
+  let moves = START_MOVES;
+  let selected = -1;
+  let busy = false;
+  let ended = false;
+  let operationId = 0;
+
+  targetEl.textContent = String(TARGET);
+
+  function randomCandy() {
+    return CANDIES[Math.floor(Math.random() * CANDIES.length)];
+  }
+
+  function indexAt(row, col) {
+    return row * SIZE + col;
+  }
+
+  function findMatches() {
+    const found = new Set();
+
+    for (let row = 0; row < SIZE; row++) {
+      let start = 0;
+      while (start < SIZE) {
+        const value = board[indexAt(row, start)];
+        let end = start + 1;
+        while (end < SIZE && board[indexAt(row, end)] === value) end++;
+        if (value !== null && end - start >= 3) {
+          for (let col = start; col < end; col++) found.add(indexAt(row, col));
+        }
+        start = end;
+      }
+    }
+
+    for (let col = 0; col < SIZE; col++) {
+      let start = 0;
+      while (start < SIZE) {
+        const value = board[indexAt(start, col)];
+        let end = start + 1;
+        while (end < SIZE && board[indexAt(end, col)] === value) end++;
+        if (value !== null && end - start >= 3) {
+          for (let row = start; row < end; row++) found.add(indexAt(row, col));
+        }
+        start = end;
+      }
+    }
+    return found;
+  }
+
+  function render() {
+    const fragment = document.createDocumentFragment();
+    board.forEach((candy, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "tile" + (selected === index ? " selected" : "");
+      button.textContent = candy || " ";
+      button.setAttribute("aria-label", "कैंडी " + (index + 1) + ": " + (candy || "खाली"));
+      button.disabled = busy || ended;
+      button.addEventListener("click", () => choose(index));
+      fragment.appendChild(button);
+    });
+    boardEl.replaceChildren(fragment);
+    scoreEl.textContent = String(score);
+    movesEl.textContent = String(moves);
+  }
+
+  function setMessage(text) {
+    messageEl.textContent = text;
+  }
+
+  function hasPossibleMove() {
+    for (let i = 0; i < board.length; i++) {
+      const row = Math.floor(i / SIZE);
+      const col = i % SIZE;
+      const neighbors = [];
+      if (col + 1 < SIZE) neighbors.push(i + 1);
+      if (row + 1 < SIZE) neighbors.push(i + SIZE);
+
+      for (const j of neighbors) {
+        [board[i], board[j]] = [board[j], board[i]];
+        const match = findMatches().size > 0;
+        [board[i], board[j]] = [board[j], board[i]];
+        if (match) return true;
+      }
+    }
+    return false;
+  }
+
+  function makeStableBoard() {
+    // Generate a board with no immediate matches and at least one valid move.
+    for (let attempt = 0; attempt < 200; attempt++) {
+      board = Array.from({ length: SIZE * SIZE }, () => null);
+      for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+          let options = CANDIES.filter(candy => {
+            const horizontal = col >= 2 &&
+              board[indexAt(row, col - 1)] === candy &&
+              board[indexAt(row, col - 2)] === candy;
+            const vertical = row >= 2 &&
+              board[indexAt(row - 1, col)] === candy &&
+              board[indexAt(row - 2, col)] === candy;
+            return !horizontal && !vertical;
+          });
+          board[indexAt(row, col)] = options[Math.floor(Math.random() * options.length)];
+        }
+      }
+      if (hasPossibleMove()) return;
+    }
+    // Extremely unlikely fallback: a fresh board; gameplay remains usable.
+    board = Array.from({ length: SIZE * SIZE }, randomCandy);
+  }
+
+  function collapseAndRefill() {
+    for (let col = 0; col < SIZE; col++) {
+      const remaining = [];
+      for (let row = SIZE - 1; row >= 0; row--) {
+        const value = board[indexAt(row, col)];
+        if (value !== null) remaining.push(value);
+      }
+      for (let row = SIZE - 1; row >= 0; row--) {
+        board[indexAt(row, col)] = remaining[SIZE - 1 - row] ?? randomCandy();
+      }
+    }
+  }
+
+  function finishIfNeeded() {
+    if (score >= TARGET) {
+      ended = true;
+      setMessage("🎉 जीत गए! आपने 500 अंक पूरे कर लिए। नया गेम खेलने के लिए बटन दबाएँ।");
+      return true;
+    }
+    if (moves <= 0) {
+      ended = true;
+      setMessage("खेल खत्म! आपका स्कोर " + score + " है। फिर से खेलने के लिए नया गेम दबाएँ।");
+      return true;
+    }
+    return false;
+  }
+
+  function resolveMatches(id) {
+    if (id !== operationId) return;
+    const matches = findMatches();
+
+    if (matches.size === 0) {
+      busy = false;
+      selected = -1;
+      if (!finishIfNeeded() && !hasPossibleMove()) {
+        makeStableBoard();
+        setMessage("नया बोर्ड तैयार है — कैंडी मिलाते रहें!");
+      }
+      render();
+      return;
+    }
+
+    matches.forEach(index => { board[index] = null; });
+    score += matches.size * 10;
+    render();
+
+    window.setTimeout(() => {
+      if (id !== operationId) return;
+      collapseAndRefill();
+      render();
+      window.setTimeout(() => resolveMatches(id), 160);
+    }, 160);
+  }
+
+  function choose(index) {
+    if (busy || ended) return;
+
+    if (selected === -1) {
+      selected = index;
+      render();
+      return;
+    }
+
+    if (selected === index) {
+      selected = -1;
+      render();
+      return;
+    }
+
+    const first = selected;
+    const rowA = Math.floor(first / SIZE);
+    const colA = first % SIZE;
+    const rowB = Math.floor(index / SIZE);
+    const colB = index % SIZE;
+
+    if (Math.abs(rowA - rowB) + Math.abs(colA - colB) !== 1) {
+      selected = index;
+      render();
+      return;
+    }
+
+    [board[first], board[index]] = [board[index], board[first]];
+    selected = -1;
+
+    if (findMatches().size === 0) {
+      [board[first], board[index]] = [board[index], board[first]];
+      setMessage("यह चाल मैच नहीं बनाती। दूसरी कैंडी आज़माएँ।");
+      render();
+      return;
+    }
+
+    moves--;
+    busy = true;
+    const id = ++operationId;
+    setMessage("शानदार! मैच बन रहा है…");
+    render();
+    window.setTimeout(() => resolveMatches(id), 160);
+  }
+
+  function restart() {
+    operationId++;
+    score = 0;
+    moves = START_MOVES;
+    selected = -1;
+    busy = false;
+    ended = false;
+    makeStableBoard();
+    setMessage("गेम शुरू है — पास-पास की कैंडी चुनें।");
+    render();
+  }
+
+  restartEl.addEventListener("click", restart);
+  restart();
+})();
+</script>
+</body>
+</html>
