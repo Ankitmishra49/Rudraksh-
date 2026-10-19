@@ -1,626 +1,511 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Train GPS Tracker - Real-time Tracking</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-xxxxxxxxxxxxxxxx"></script>
+    <title>श्री गौरीशंकर व सीताराम मंदिर - ऑनलाइन सेवा पोर्टल</title>
     <style>
-        * {
-            box-sizing: border-box;
+        :root {
+            --primary: #e65100; /* शुद्ध भगवा */
+            --secondary: #ffb74d;
+            --dark: #bf360c;
+            --gold: #ffd700;
+            --light: #fff8e1; /* हल्का पीला भक्तिमय बैकग्राउंड */
         }
-
+        
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
+            color: #3e2723;
         }
 
-        .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        header {
+            background: linear-gradient(135deg, var(--dark), var(--primary));
             color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 35px 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border-bottom: 5px solid var(--gold);
         }
 
-        .navbar h1 {
+        header h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            letter-spacing: 1px;
         }
 
-        .nav-buttons {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .nav-btn.premium {
-            background: #ffd700;
-            color: #333;
-            border: none;
-        }
-
-        .nav-btn.premium:hover {
-            background: #ffed4e;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .ad-top {
-            background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-
-        .ad-placeholder {
-            background: #f0f0f0;
-            padding: 2rem;
-            border-radius: 6px;
-            color: #999;
-            font-size: 13px;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 2rem;
-        }
-
-        .content {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .sidebar-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin: 0 0 1rem 0;
-            color: #333;
-        }
-
-        .premium-badge {
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            color: #333;
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .premium-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
-        }
-
-        .premium-features {
-            font-size: 12px;
-            color: #666;
-            line-height: 1.8;
-        }
-
-        .premium-features li {
-            margin: 6px 0;
-        }
-
-        .info-box {
-            background: #e3f2fd;
-            border-left: 4px solid #2196F3;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            border-radius: 8px;
-            font-size: 13px;
-            color: #1565c0;
-        }
-
-        .track-view {
-            background: #f5f5f5;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            padding: 2rem 1rem;
-            position: relative;
-            height: 200px;
-            overflow: hidden;
-        }
-
-        .track-line {
-            position: absolute;
-            width: calc(100% - 100px);
-            height: 6px;
-            background: linear-gradient(to right, #667eea, #764ba2);
-            top: 50%;
-            left: 50px;
-            transform: translateY(-50%);
-            border-radius: 3px;
-        }
-
-        .station-start, .station-end {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        header .sub-tag {
+            margin: 10px 0 5px 0;
             font-size: 18px;
+            font-style: italic;
+            color: var(--gold);
             font-weight: bold;
         }
 
-        .station-start {
-            left: 10px;
-            background: #4caf50;
-            color: white;
+        header .owner-info {
+            margin: 5px 0 5px 0;
+            font-size: 15px;
+            color: #ffffff;
+            font-weight: bold;
         }
 
-        .station-end {
-            right: 10px;
-            background: #f44336;
-            color: white;
+        header .address-info {
+            margin: 5px 0 0 0;
+            font-size: 13px;
+            color: #ffe082;
+            font-style: normal;
         }
 
-        .train {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: left 0.3s ease;
+        .container {
+            max-width: 750px;
+            margin: 40px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: 1px solid #ffe082;
         }
 
-        .train-icon {
-            font-size: 40px;
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
             margin-bottom: 8px;
+            color: var(--dark);
         }
 
-        .train-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #333;
+        input[type="text"], input[type="email"], input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ffcc80;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            background-color: #fffde7;
         }
 
-        .controls {
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #fff;
+        }
+
+        .amount-buttons {
             display: flex;
-            gap: 12px;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            background: #f0f0f0;
+        .amt-btn {
+            flex: 1;
+            padding: 12px;
+            background: #fff3e0;
+            border: 2px solid #ffe082;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-            transition: all 0.3s;
+            font-weight: bold;
+            color: var(--dark);
+            transition: 0.3s;
         }
 
-        .btn:hover {
-            background: #e0e0e0;
-            transform: translateY(-2px);
-        }
-
-        .btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .amt-btn:hover, .amt-btn.active {
+            background: var(--primary);
             color: white;
+            border-color: var(--primary);
         }
 
-        .distance-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .btn-submit {
+            background: linear-gradient(to right, var(--primary), var(--dark));
             color: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            padding: 15px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .distance-label {
-            font-size: 13px;
-            opacity: 0.9;
-            margin: 0;
-        }
-
-        .distance-value {
-            font-size: 36px;
-            font-weight: 700;
-            margin: 0.5rem 0 0 0;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-        }
-
-        .stat-card {
-            background: #f9f9f9;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 1.5rem;
-        }
-
-        .stat-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin: 0 0 1rem 0;
-            color: #333;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            margin: 10px 0;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .stat-label {
-            color: #999;
-        }
-
-        .stat-value {
-            font-weight: 600;
-            color: #333;
-            font-family: monospace;
-        }
-
-        .ad-sidebar {
-            background: white;
-            padding: 1rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            color: #999;
-            font-size: 12px;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 2rem;
-            color: #999;
-            font-size: 12px;
-            margin-top: 2rem;
-        }
-
-        .modal {
+        /* Payment Gateway / QR Code Section */
+        .payment-section {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            margin-top: 30px;
+            padding: 20px;
+            background: #fffde7;
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            background: #e0e0e0;
+            margin: 15px auto;
+            display: flex;
             align-items: center;
             justify-content: center;
+            border: 2px solid var(--dark);
+            font-weight: bold;
+            color: #666;
         }
 
-        .modal.active {
-            display: flex;
+        .qr-placeholder.has-qr { background: white; padding: 8px; box-sizing: content-box; }
+        .qr-placeholder img, .qr-placeholder canvas { max-width: 100%; height: auto; }
+
+        .upi-pay-link {
+            display: none;
+            margin: 15px auto 5px;
+            padding: 12px 20px;
+            background: linear-gradient(to right, var(--primary), var(--dark));
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            max-width: 280px;
         }
 
-        .modal-content {
+        .form-msg {
+            display: none;
+            margin-top: 15px;
+            padding: 12px;
+            background: #e8f5e9;
+            border: 1px solid #81c784;
+            border-radius: 8px;
+            color: #1b5e20;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .upi-id-box {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dark);
             background: white;
-            padding: 2rem;
+            padding: 10px;
+            border: 1px solid #ffcc80;
+            display: inline-block;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        /* AI Chatbot Window */
+        .ai-chat-widget {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 340px;
+            background: white;
             border-radius: 12px;
-            max-width: 500px;
-            width: 90%;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid var(--primary);
+            z-index: 1000;
         }
 
-        .modal-close {
-            float: right;
+        .chat-header {
+            background: linear-gradient(to right, var(--dark), var(--primary));
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .chat-toggle {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.6);
+            color: white;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 24px;
-            color: #999;
+            padding: 2px 10px;
+            font-size: 16px;
         }
 
-        @media (max-width: 900px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
+        .ai-chat-widget.collapsed .chat-box,
+        .ai-chat-widget.collapsed .chat-input-area { display: none; }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 480px) {
+            .ai-chat-widget { right: 10px; left: 10px; bottom: 10px; width: auto; }
+            header h1 { font-size: 24px; }
+            .amount-buttons { flex-wrap: wrap; }
+            .amt-btn { flex: 1 1 40%; }
+        }
 
-            .nav-buttons {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
+        .chat-box {
+            height: 240px;
+            padding: 15px;
+            overflow-y: auto;
+            background: #fffde7;
+            font-size: 14px;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            max-width: 80%;
+            line-height: 1.4;
+        }
+
+        .message.bot {
+            background: #ffe082;
+            color: #5d4037;
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+
+        .message.user {
+            background: var(--secondary);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+            border-bottom-right-radius: 0;
+        }
+
+        .chat-input-area {
+            display: flex;
+            border-top: 1px solid #ffcc80;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            outline: none;
+            background: white;
+        }
+
+        .chat-send {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            cursor: pointer;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <h1>🚂 Train GPS Tracker</h1>
-        <div class="nav-buttons">
-            <button class="nav-btn" onclick="showLogin()">Login</button>
-            <button class="nav-btn premium" onclick="showPremium()">⭐ Premium</button>
-        </div>
-    </div>
 
-    <div class="container">
-        <div class="ad-top">
-            <div class="ad-placeholder">
-                [Google AdSense Banner Ad 728x90]<br>
-                Replace with: &lt;script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"&gt;&lt;/script&gt;
+<header>
+    <h1>🛕 श्री गौरीशंकर व सीताराम मंदिर</h1>
+    <div class="sub-tag">"सियाराम मय सब जग जानी, करहु प्रनाम जोरि जुग पानी"</div>
+    <div class="owner-info">मुख्य प्रबंधक/ओनर: श्री अंकित कुमार मिश्रा (उर्फ गगन मिश्रा)</div>
+    <div class="address-info">📍 पता: झुड़िया, खजनी, गोरखपुर, उत्तर प्रदेश - 273212</div>
+</header>
+
+<div class="container">
+    <h2 style="color: var(--dark); text-align: center; margin-top: 0;">डिजिटल दान एवं चढ़ावा रसीद काउंटर</h2>
+    <form id="mandirForm" onsubmit="processMandirDonation(event)">
+        <div class="form-group">
+            <label for="devoteeName">भक्त का पूरा नाम (Devotee Name):</label>
+            <input type="text" id="devoteeName" required placeholder="अपना नाम दर्ज करें">
+        </div>
+
+        <div class="form-group">
+            <label for="devoteePhone">व्हाट्सएप / मोबाइल नंबर (WhatsApp No):</label>
+            <input type="tel" id="devoteePhone" required inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}" title="कृपया 10 अंकों का सही मोबाइल नंबर लिखें" placeholder="10 अंकों का मोबाइल नंबर दर्ज करें">
+        </div>
+
+        <div class="form-group">
+            <label for="gotra">गोत्र (Gotra):</label>
+            <input type="text" id="gotra" placeholder="संकल्प हेतु अपना गोत्र लिखें (वैकल्पिक)">
+        </div>
+
+        <div class="form-group">
+            <label for="sevaType">सेवा का चयन करें (Select Sewa):</label>
+            <select id="sevaType">
+                <option value="मंदिर विकास व निर्माण कार्य">मंदिर विकास व निर्माण कार्य</option>
+                <option value="दैनिक भंडारा व अन्नदान">दैनिक भंडारा व अन्नदान</option>
+                <option value="गौशाला सेवा (गौ सेवा)">गौशाला सेवा (गौ सेवा)</option>
+                <option value="दैनिक श्रृंगार एवं आरती सेवा">दैनिक श्रृंगार एवं आरती सेवा</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>श्रद्धा राशि (Donation Amount):</label>
+            <div class="amount-buttons">
+                <button type="button" class="amt-btn" onclick="setMandirAmount(151, this)">₹151</button>
+                <button type="button" class="amt-btn" onclick="setMandirAmount(501, this)">₹501</button>
+                <button type="button" class="amt-btn" onclick="setMandirAmount(1100, this)">₹1100</button>
+                <button type="button" class="amt-btn" onclick="setMandirAmount(5100, this)">₹5100</button>
             </div>
+            <input type="number" id="mandirAmount" required min="11" step="1" inputmode="numeric" placeholder="या अन्य कोई राशि यहाँ भरें (न्यूनतम ₹11)" oninput="clearActiveAmount()">
         </div>
 
-        <div class="main-grid">
-            <div class="content">
-                <div class="info-box">
-                    💡 Real-time GPS tracking of trains. Works offline in flight mode!
-                </div>
+        <button type="submit" class="btn-submit">🕉️ डिजिटल चढ़ावा अर्पण करें (Proceed to Pay)</button>
+    </form>
 
-                <div class="track-view">
-                    <div class="track-line"></div>
-                    <div class="station-start">A</div>
-                    <div class="station-end">B</div>
-                    <div class="train" id="train-a" style="left: 50px;">
-                        <div class="train-icon">🚂</div>
-                        <div class="train-label">Train A</div>
-                    </div>
-                    <div class="train" id="train-b" style="left: 400px;">
-                        <div class="train-icon">🚆</div>
-                        <div class="train-label">Train B</div>
-                    </div>
-                </div>
+    <div class="form-msg" id="formMsg"></div>
 
-                <div class="controls">
-                    <button class="btn active" onclick="togglePlay()">▶️ Start</button>
-                    <button class="btn" onclick="togglePause()">⏸️ Pause</button>
-                    <button class="btn" onclick="resetTrains()">🔄 Reset</button>
-                </div>
-
-                <div class="distance-card">
-                    <p class="distance-label">Distance Between Trains</p>
-                    <p class="distance-value" id="distance">0.0 km</p>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3 class="stat-title">🚂 Train A</h3>
-                        <div class="stat-row">
-                            <span class="stat-label">Latitude</span>
-                            <span class="stat-value" id="lat-a">28.7041°</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Longitude</span>
-                            <span class="stat-value" id="lon-a">77.1025°</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Speed</span>
-                            <span class="stat-value" id="speed-a">0 km/h</span>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <h3 class="stat-title">🚆 Train B</h3>
-                        <div class="stat-row">
-                            <span class="stat-label">Latitude</span>
-                            <span class="stat-value" id="lat-b">28.7100°</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Longitude</span>
-                            <span class="stat-value" id="lon-b">77.1200°</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Speed</span>
-                            <span class="stat-value" id="speed-b">0 km/h</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="sidebar">
-                <div class="sidebar-card">
-                    <div class="premium-badge" onclick="showPremium()">
-                        ⭐ Go Premium
-                        <div style="font-size: 12px; margin-top: 0.5rem; font-weight: normal;">
-                            ₹99/month
-                        </div>
-                    </div>
-                </div>
-
-                <div class="sidebar-card">
-                    <h3 class="sidebar-title">📊 Premium Features</h3>
-                    <ul class="premium-features">
-                        <li>✅ Track 10+ trains</li>
-                        <li>✅ Advanced analytics</li>
-                        <li>✅ Export to CSV/PDF</li>
-                        <li>✅ Real-time alerts</li>
-                        <li>✅ No ads</li>
-                        <li>✅24/7 support</li>
-                    </ul>
-                </div>
-
-                <div class="ad-sidebar">
-                    [Google AdSense<br>Vertical Ad 300x250]
-                </div>
-
-                <div class="sidebar-card">
-                    <h3 class="sidebar-title">📱 Stats</h3>
-                    <div style="font-size: 12px; color: #666; line-height: 2;">
-                        <div>👥 5,234 Users</div>
-                        <div>🚂 12,450 Trains</div>
-                        <div>📍 150K+ Journeys</div>
-                    </div>
-                </div>
-            </div>
+    <div class="payment-section" id="paymentSection">
+        <h3 style="color: var(--dark); margin-top: 0;">🙏 डिजिटल चढ़ावा भुगतान स्क्रीन</h3>
+        <p>कृपया नीचे दिए गए QR कोड को किसी भी UPI ऐप (PhonePe, Paytm, GooglePay) से स्कैन करें या UPI ID पर भुगतान करें।</p>
+        
+        <div class="qr-placeholder" id="qrBox">
+            QR बन रहा है...
         </div>
-    </div>
 
-    <div class="footer">
-        <strong>Train GPS Tracker</strong> • Premium Train Tracking Solution • Monetized App v1.0<br>
-        Contact: support@traingpstracker.com | Help | Privacy | Terms
-    </div>
+        <a class="upi-pay-link" id="upiPayLink" href="#">📱 UPI ऐप से सीधे भुगतान करें</a>
 
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('loginModal')">&times;</span>
-            <h2>Login / Sign Up</h2>
-            <input type="email" placeholder="Email" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px;">
-            <input type="password" placeholder="Password" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px;">
-            <button style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Login</button>
+        <div><strong>जमा की जाने वाली राशि:</strong> <span id="displayAmount" style="color: var(--dark); font-size: 20px;">₹0</span></div>
+        
+        <p style="font-size: 14px; color: var(--dark); font-weight: bold; margin: 10px 0 0 0;">
+            🏦 भुगतान प्राप्तकर्ता: श्री अंकित कुमार मिश्रा (मुख्य प्रबंधक, श्री गौरीशंकर व सीताराम मंदिर)
+        </p>
+
+        <div class="upi-id-box">
+            UPI ID: <span id="upiIdText"></span>
         </div>
+        <p style="font-size: 12px; color: #666; margin-top: 15px;">⚠️ भुगतान करने के बाद मंदिर कार्यालय द्वारा आपके मोबाइल नंबर पर रसीद की पुष्टि भेजी जाएगी।</p>
     </div>
+</div>
 
-    <div class="modal" id="premiumModal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('premiumModal')">&times;</span>
-            <h2>⭐ Premium Plan</h2>
-            <h3 style="color: #667eea;">₹99/month</h3>
-            <ul style="font-size: 14px; line-height: 2; color: #666;">
-                <li>✅ Track unlimited trains</li>
-                <li>✅ Advanced analytics & reports</li>
-                <li>✅ Export to CSV/PDF</li>
-                <li>✅ Real-time push notifications</li>
-                <li>✅ Remove all ads</li>
-                <li>✅ Priority support</li>
-                <li>✅ Custom alerts</li>
-            </ul>
-            <button onclick="proceedPayment()" style="width: 100%; padding: 12px; background: #ffd700; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 1rem;">Get Premium Now</button>
-        </div>
+<div class="ai-chat-widget" id="chatWidget">
+    <div class="chat-header">
+        <span>🤖 सीताराम मंदिर AI सहायक</span>
+        <button type="button" class="chat-toggle" id="chatToggle" onclick="toggleChat()" aria-label="चैट खोलें/बंद करें">—</button>
     </div>
+    <div class="chat-box" id="chatBox">
+        <div class="message bot">जय सिया राम! हर हर महादेव! 🙏 मैं श्री गौरीशंकर व सीताराम मंदिर का डिजिटल सहायक हूँ। मैं आपकी क्या सेवा कर सकता हूँ?</div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="chatInput" class="chat-input" placeholder="यहाँ प्रश्न पूछें (उदा: मंदिर कहाँ है?)..." onkeydown="handleChatKey(event)">
+        <button type="button" class="chat-send" onclick="sendChatMessage()">पूछें</button>
+    </div>
+</div>
 
-    <script>
-        let state = {
-            isRunning: false,
-            time: 0,
-            trackLength: 500,
-            positionA: 50,
-            positionB: 400,
-            speedA: 80,
-            speedB: 95,
-            baseLatA: 28.7041,
-            baseLonA: 77.1025,
-            baseLatB: 28.7100,
-            baseLonB: 77.1200
-        };
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    /* ====== यहाँ अपने मंदिर की असली जानकारी भरें ====== */
+    const MANDIR_CONFIG = {
+        upiId: "9559657469@pthdfc",     // मंदिर की UPI ID (आपके QR से पढ़ी गई)
+        payeeName: "Ankit Kumar Mishra"
+    };
+    /* ================================================== */
 
-        function togglePlay() {
-            state.isRunning = true;
-            animate();
+    document.getElementById('upiIdText').textContent = MANDIR_CONFIG.upiId;
+
+    function setMandirAmount(val, btn) {
+        document.getElementById('mandirAmount').value = val;
+        document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+    }
+
+    function clearActiveAmount() {
+        document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
+    }
+
+    function processMandirDonation(e) {
+        e.preventDefault();
+        const name = document.getElementById('devoteeName').value.trim();
+        const amount = parseInt(document.getElementById('mandirAmount').value, 10);
+        const seva = document.getElementById('sevaType').value;
+
+        if (!amount || amount < 11) {
+            alert("कृपया कम से कम ₹11 की राशि दर्ज करें।");
+            return;
         }
 
-        function togglePause() {
-            state.isRunning = false;
+        document.getElementById('displayAmount').textContent = "₹" + amount;
+
+        // UPI लिंक (राशि के साथ) - इसी से QR भी बनता है
+        const upiLink = "upi://pay?pa=" + encodeURIComponent(MANDIR_CONFIG.upiId) +
+            "&pn=" + encodeURIComponent(MANDIR_CONFIG.payeeName) +
+            "&am=" + amount + "&cu=INR&tn=" + encodeURIComponent(seva);
+
+        const qrBox = document.getElementById('qrBox');
+        qrBox.innerHTML = "";
+        if (typeof QRCode !== "undefined") {
+            new QRCode(qrBox, { text: upiLink, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
+            qrBox.classList.add('has-qr');
+        } else {
+            qrBox.classList.remove('has-qr');
+            qrBox.textContent = "QR लोड नहीं हुआ - नीचे UPI ID पर भुगतान करें";
         }
 
-        function resetTrains() {
-            state.time = 0;
-            state.positionA = 50;
-            state.positionB = 400;
-            state.isRunning = false;
-            updateUI();
+        const payLink = document.getElementById('upiPayLink');
+        payLink.href = upiLink;
+        payLink.style.display = "block";
+
+        const msg = document.getElementById('formMsg');
+        msg.textContent = "जय सिया राम! भक्त " + name + " जी, आपका \"" + seva + "\" हेतु ₹" + amount +
+            " का संकल्प दर्ज हो गया है। कृपया नीचे QR स्कैन करके दान पूरा करें।";
+        msg.style.display = "block";
+
+        const pay = document.getElementById('paymentSection');
+        pay.style.display = "block";
+        pay.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function toggleChat() {
+        const w = document.getElementById('chatWidget');
+        w.classList.toggle('collapsed');
+        document.getElementById('chatToggle').textContent = w.classList.contains('collapsed') ? "＋" : "—";
+    }
+    if (window.innerWidth < 600) toggleChat(); // मोबाइल पर चैट शुरू में बंद
+
+    function addChatMessage(text, who) {
+        const chatBox = document.getElementById('chatBox');
+        const div = document.createElement('div');
+        div.className = 'message ' + who;
+        div.textContent = text;          // textContent: सुरक्षित (HTML injection नहीं)
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function getBotReply(userText) {
+        const t = userText.toLowerCase();
+        const has = (...words) => words.some(w => t.includes(w));
+        const hasWord = (re) => re.test(t);
+
+        if (has("कहाँ", "कहां", "पता", "address", "location", "रास्ता")) {
+            return "श्री गौरीशंकर व सीताराम मंदिर का पता पेज के सबसे ऊपर हेडर में दिया गया है। आप कार्यालय में आकर गगन मिश्रा जी से भी मिल सकते हैं।";
         }
-
-        function animate() {
-            if (!state.isRunning) return;
-
-            state.time += 0.016;
-            state.positionA += (state.speedA / 3600);
-            state.positionB += (state.speedB / 3600);
-
-            if (state.positionA > state.trackLength + 50) state.positionA = -50;
-            if (state.positionB > state.trackLength + 50) state.positionB = -50;
-
-            state.speedA = 80 + Math.sin(state.time * 0.5) * 20;
-            state.speedB = 95 + Math.cos(state.time * 0.4) * 25;
-
-            updateUI();
-            requestAnimationFrame(animate);
+        if (has("ओनर", "owner", "अंकित", "गगन", "मिश्रा", "प्रबंधक")) {
+            return "इस पावन मंदिर के मुख्य प्रबंधक और ओनर श्री अंकित कुमार मिश्रा जी हैं, जिन्हें सभी आदर से श्री गगन मिश्रा जी के नाम से भी जानते हैं।";
         }
-
-        function updateUI() {
-            document.getElementById('train-a').style.left = (50 + state.positionA) + 'px';
-            document.getElementById('train-b').style.left = (50 + state.positionB) + 'px';
-
-            const latA = (state.baseLatA + state.positionA * 0.0001).toFixed(4);
-            const lonA = (state.baseLonA + state.positionA * 0.0002).toFixed(4);
-            const latB = (state.baseLatB + state.positionB * 0.0001).toFixed(4);
-            const lonB = (state.baseLonB + state.positionB * 0.0002).toFixed(4);
-
-            document.getElementById('lat-a').textContent = latA + '°';
-            document.getElementById('lon-a').textContent = lonA + '°';
-            document.getElementById('lat-b').textContent = latB + '°';
-            document.getElementById('lon-b').textContent = lonB + '°';
-
-            document.getElementById('speed-a').textContent = Math.max(0, Math.round(state.speedA)) + ' km/h';
-            document.getElementById('speed-b').textContent = Math.max(0, Math.round(state.speedB)) + ' km/h';
-
-            const distance = Math.abs(state.positionB - state.positionA) * 0.1;
-            document.getElementById('distance').textContent = distance.toFixed(1) + ' km';
+        if (has("समय", "आरती", "टाइम", "timing", "दर्शन")) {
+            return "मंदिर में दर्शन सुबह 5:30 से दोपहर 12:00 बजे तक और शाम 4:00 से रात 9:00 बजे तक खुले रहते हैं। विशेष संध्या आरती शाम 7:00 बजे होती है।";
         }
-
-        function showLogin() {
-            document.getElementById('loginModal').classList.add('active');
+        if (has("यूपीआई", "upi", "qr", "स्कैन", "दान", "चढ़ावा") || hasWord(/\bpay\b/)) {
+            return "आप फॉर्म भरकर 'डिजिटल चढ़ावा अर्पण करें' बटन दबाएंगे तो आपकी राशि के साथ मंदिर का UPI QR कोड और ID सामने आ जाएगी।";
         }
-
-        function showPremium() {
-            document.getElementById('premiumModal').classList.add('active');
+        if (has("राम", "महादेव", "नमस्ते", "प्रणाम") || hasWord(/\b(hi|hello)\b/)) {
+            return "जय सिया राम! हर हर महादेव! 🙏 भगवान भोलेनाथ और प्रभु श्रीराम की कृपा आप पर सदा बनी रहे। आज आप मंदिर की किस सेवा में योगदान देना चाहते हैं?";
         }
+        return "जय सिया राम! इस विषय में अधिक जानकारी के लिए आप मंदिर प्रबंधन या सीधे गगन मिश्रा जी से कार्यालय में संपर्क कर सकते हैं।";
+    }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
+    function sendChatMessage() {
+        const inputField = document.getElementById('chatInput');
+        const userText = inputField.value.trim();
+        if (userText === "") return;
+
+        addChatMessage(userText, 'user');
+        inputField.value = "";
+        setTimeout(() => addChatMessage(getBotReply(userText), 'bot'), 600);
+    }
+
+    function handleChatKey(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendChatMessage();
         }
+    }
+</script>
 
-        function proceedPayment() {
-            alert('Payment Gateway Integration (Razorpay/Stripe)\nRedirect to payment page...');
-            closeModal('premiumModal');
-        }
-
-        updateUI();
-    </script>
 </body>
 </html>
